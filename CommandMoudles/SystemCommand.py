@@ -1,8 +1,14 @@
 import Command,CacheHandle
 
-@Command.command_listener('帮助','help','help','查询帮助菜单')
-def command_help(message):
+command_help_auxiliary = ['h']
+@Command.command_listener(command_cn='帮助',command_en='help',command_en_short='h',descript='查询帮助菜单',auxiliary_command=command_help_auxiliary)
+def command_help(message,auxiliary):
     reply_text = "心智模型003号为您服务\n欢迎查询帮助菜单\n当前可用查询为:None"
+    reply_data = {
+        '':"心智模型003号为您服务\n欢迎查询帮助菜单\n当前可用查询为:None",
+        "h":"心智模型003号为您服务\n欢迎查询帮助菜单\n目前没有可选的帮助项"
+    }
+    reply_text = reply_data[auxiliary]
     reply_data = {
         "message_source":message['message_source'],
         "message_type":'reply',
