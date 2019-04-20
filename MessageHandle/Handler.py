@@ -28,7 +28,7 @@ def command_handle(message):
 # 判断是否含有当前命令
 def command_judge(command,text):
     auxiliary = ''
-    if (len(command.command_cn) or len(command.command_en) or len(command.command_en_short)) > len(text):
+    if (len(command.command_cn) and len(command.command_en) and len(command.command_en_short)) > len(text):
         return [False]
     if command.accurate:
         if text not in [command.command_cn,command.command_en,command.command_en_short]:

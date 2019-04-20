@@ -11,6 +11,8 @@ def handle_message(context):
         "message_type":"normal",
         "data":context
     }
+    if 'group_id' in context:
+        qq_message['message_source'] = 'qq_group'
     CacheHandle.now_queue.put(qq_message)
 
 CacheHandle.qq_bot = qq_bot

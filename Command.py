@@ -1,9 +1,9 @@
 from functools import wraps
-import CacheHandle,Config
+import CacheHandle,Config,datetime
 
 # 构造命令对象
 class Command:
-    def __init__(self,command_cn:str,command_en:str,command_en_short:str,descript:str,accurate:bool,auxiliary_command,func:callable):
+    def __init__(self,command_cn:str,command_en:str,command_en_short:str,descript:str,accurate:bool,auxiliary_command:list,func:callable):
         self.command_cn = command_cn
         self.command_en = command_en
         self.command_en_short = command_en_short
@@ -40,3 +40,14 @@ def get_auxiliary_command(command,text):
     if auxiliary in command.auxiliary_command:
         return auxiliary
     return ''
+
+# 判断指令是否在cd时间内
+def judge_command_cd(user_type,user_id,command_id,command_cd):
+    if CacheHandle.user_data[user_type].has_key(user_id):
+        if CacheHandle.user_data[user_type][user_id].has_key('cd'):
+            if CacheHandle.user_data[user_type][user_id][cd].has_key(command_id):
+                cd_start_time = CacheHandle.user_data[user_type][user_id][cd][command_id]['start_time']
+                now_time = datetime.datetime.now()
+                if now_time - cd_start_time < command_cd:
+                    return False
+    return True
