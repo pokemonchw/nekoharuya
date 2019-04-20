@@ -1,0 +1,1 @@
+from MessageMoudle import QQMessage
