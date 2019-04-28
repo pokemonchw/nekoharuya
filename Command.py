@@ -1,5 +1,5 @@
 from functools import wraps
-import CacheHandle,Config,datetime
+import CacheHandle,Config,time
 
 # 构造命令对象
 class Command:
@@ -47,7 +47,7 @@ def judge_command_cd(user_type,user_id,command_id,command_cd):
         if 'cd' in CacheHandle.user_data[user_type][user_id]:
             if command_id in CacheHandle.user_data[user_type][user_id]['cd']:
                 cd_start_time = CacheHandle.user_data[user_type][user_id]['cd'][command_id]['start_time']
-                now_time = datetime.datetime.now()
-                if (now_time - cd_start_time).total_seconds() < command_cd:
+                now_time = time.time()
+                if now_time - cd_start_time < command_cd:
                     return False
     return True

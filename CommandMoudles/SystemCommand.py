@@ -1,4 +1,4 @@
-import Command,CacheHandle,datetime
+import Command,CacheHandle,time
 
 command_help_auxiliary = ['h']
 
@@ -26,7 +26,7 @@ def command_help(message,auxiliary):
         cd_user = reply_data['data']['group_id']
         now_cd = 6000
     if Command.judge_command_cd(message['message_source'],cd_user,'help',now_cd):
-        now_time = datetime.datetime.now()
+        now_time = time.time()
         cd_data = {
             "cd":{
                 "help":{
@@ -36,13 +36,6 @@ def command_help(message,auxiliary):
         }
         CacheHandle.user_data[message['message_source']].update({cd_user:cd_data})
     else:
-        reply_data = {
-            "message_source":message['message_source'],
-            "message_type":'warning',
-            "data":{
-                "warning_type":"command_cd",
-                "message_active_region":message['data']['message_type'],
-                "user_id":message['data']['user_id'],
-            }
-        }
+        reply_data["message_type"] = "warning"
+        reply_data['data'].update({"warning_type":"command_cd"})
     CacheHandle.now_queue.put(reply_data)
