@@ -22,7 +22,6 @@ def load_json(file_path):
 
 # 保存数据到json
 def save_json(file_path,data):
-    print(data)
     data_string = json.dumps(data)
     data_file = open(file_path,'w',encoding='utf-8')
     data_file.write(data_string)

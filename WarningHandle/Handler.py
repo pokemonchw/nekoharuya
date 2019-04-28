@@ -10,8 +10,8 @@ def start():
             eval(now_data['data']['warning_type'] + '_warning')(now_data)
 
 command_cd_warning_text_data = {
-    "qq":"您在段时间内已使用过本命令,请勿频繁操作",
-    "qq_group":"群内已有人在段时间内使用过本命令,请勿频繁操作"
+    "qq":"您在短时间内已使用过本命令,请勿频繁操作",
+    "qq_group":"群内已有人在短时间内使用过本命令,请勿频繁操作"
 }
 def command_cd_warning(message):
     message['message_type'] = 'reply'
