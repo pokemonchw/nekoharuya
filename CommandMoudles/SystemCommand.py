@@ -20,7 +20,7 @@ def command_help(message,auxiliary):
         }
     }
     now_cd = 600
-    cd_user = reply_data[data]["user_id"]
+    cd_user = reply_data['data']["user_id"]
     if message['message_source'] == 'qq_group':
         reply_data['data'].update({"group_id":message["data"]["group_id"]})
         cd_user = reply_data['data']['group_id']
@@ -34,7 +34,7 @@ def command_help(message,auxiliary):
                 }
             }
         }
-        CacheHandle.user_data[message['message_source']][cd_user].update(cd_data)
+        CacheHandle.user_data[message['message_source']].update({cd_user:cd_data})
     else:
         reply_data = {
             "message_source":message['message_source'],
@@ -43,7 +43,6 @@ def command_help(message,auxiliary):
                 "warning_type":"command_cd",
                 "message_active_region":message['data']['message_type'],
                 "user_id":message['data']['user_id'],
-                "message":"该指令正在冷却中,请勿频繁调用"
             }
         }
     CacheHandle.now_queue.put(reply_data)

@@ -43,11 +43,11 @@ def get_auxiliary_command(command,text):
 
 # 判断指令是否在cd时间内
 def judge_command_cd(user_type,user_id,command_id,command_cd):
-    if CacheHandle.user_data[user_type].has_key(user_id):
-        if CacheHandle.user_data[user_type][user_id].has_key('cd'):
-            if CacheHandle.user_data[user_type][user_id][cd].has_key(command_id):
-                cd_start_time = CacheHandle.user_data[user_type][user_id][cd][command_id]['start_time']
+    if user_id in CacheHandle.user_data[user_type]:
+        if 'cd' in CacheHandle.user_data[user_type][user_id]:
+            if command_id in CacheHandle.user_data[user_type][user_id]['cd']:
+                cd_start_time = CacheHandle.user_data[user_type][user_id]['cd'][command_id]['start_time']
                 now_time = datetime.datetime.now()
-                if now_time - cd_start_time < command_cd:
+                if (now_time - cd_start_time).total_seconds() < command_cd:
                     return False
     return True
