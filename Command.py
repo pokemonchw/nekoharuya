@@ -1,5 +1,5 @@
 from functools import wraps
-import CacheHandle,Config,time
+import CacheHandle,Config,time,sys
 
 # 构造命令对象
 class Command:
@@ -18,21 +18,36 @@ def command_listener(command_cn:str,command_en:str,command_en_short:str,descript
         @wraps(func)
         def return_wrapper(*args,**kwargs):
             return func(*args,**kwargs)
-        CacheHandle.append_command(Command(command_cn,command_en,command_en_short,descript,accurate,auxiliary_command,return_wrapper))
-        CacheHandle.create_variavle(func.__name__,return_wrapper)
+        append_command(Command(command_cn,command_en,command_en_short,descript,accurate,auxiliary_command,return_wrapper))
+        create_variavle(func.__name__,return_wrapper)
         return return_wrapper
     return decorator
 
+# 添加命令进命令列表
+def append_command(command:Command):
+    CacheHandle.command_list.append(command)
+    auxiliary_info = '辅助命令:'
+    for i in command.auxiliary_command:
+        auxiliary_info += ' ' + i
+    CacheHandle.command_list_all_info += "命令:" + command.command_cn + ' en:' + command.command_en + ' short:' + command.command_en_short + '\n  描述:\n    ' + command.descript + '\n  ' + auxiliary_info + '\n'
+    CacheHandle.command_list_short_info += "命令" + command.command_cn + ' en:' + command.command_en + ' short:' + command.command_en_short + '\n'
+    CacheHandle.command_list_info += "命令:" + command.command_cn + ' en:' + command.command_en + ' short:' + command.command_en_short + '\n  描述:\n    ' + command.descript + '\n'
+
+# 创建命令模组
+def create_variavle(name,var):
+    this_module = sys.modules[__name__]
+    setattr(this_module,name,var)
+
 # 获取当前辅助命令
 def get_auxiliary_command(command,text):
-    auxiliary = ''
-    while(text.startswith(command.command_cn)):
+    auxiliary = text
+    while(auxiliary.startswith(command.command_cn)):
         auxiliary = text.lstrip(command.command_cn)
         break
-    while(text.startswith(command.command_en)):
+    while(auxiliary.startswith(command.command_en)):
         auxiliary = text.lstrip(command.command_en)
         break
-    while(text.startswith(command.command_en_short)):
+    while(auxiliary.startswith(command.command_en_short)):
         auxiliary = text.lstrip(command.command_en_short)
         break
     if auxiliary.startswith(Config.auxiliary_command_switch):
@@ -51,3 +66,43 @@ def judge_command_cd(user_type,user_id,command_id,command_cd):
                 if now_time - cd_start_time < command_cd:
                     return False
     return True
+
+# 处理命令的cd
+def cd_handler(command_id,reply_data,now_cd,qq_group_cd,message,max_index=0):
+    cd_user = reply_data['data']["user_id"]
+    if message['message_source'] == 'qq_group':
+        reply_data['data'].update({"group_id":message["data"]["group_id"]})
+        cd_user = reply_data['data']['group_id']
+        now_cd = qq_group_cd
+    if judge_command_cd(message['message_source'],cd_user,command_id,now_cd):
+        cd_data = get_cd_starttime_data(command_id)
+        cd_data['cd'][command_id].update({"cd_index":1})
+        CacheHandle.user_data[message['message_source']].update({cd_user:cd_data})
+    else:
+        if CacheHandle.user_data[message['message_source']][cd_user]['cd'][command_id]['cd_index'] >= max_index:
+            reply_data["message_type"] = "warning"
+            reply_data['data'].update({"warning_type":"command_cd"})
+        else:
+            CacheHandle.user_data[message['message_source']][cd_user]['cd'][command_id]['cd_index'] += 1
+
+# 获取命令cd开始时间数据
+def get_cd_starttime_data(command_id):
+    now_time = time.time()
+    return {
+        "cd":{
+            command_id:{
+                "start_time":now_time
+            }
+        }
+    }
+
+# 将接收消息转换为回复消息结构体
+def message_data_to_reply_data(message):
+    return {
+        "message_source":message['message_source'],
+        "message_type":'reply',
+        "data":{
+            "message_active_region":message['data']['message_type'],
+            "user_id":message['data']['user_id'],
+        }
+    }

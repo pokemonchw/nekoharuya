@@ -1,41 +1,35 @@
-import Command,CacheHandle,time
+import Command,CacheHandle
 
 command_help_auxiliary = ['h']
-
 help_reply_data = {
     '':"心智模型003号为您服务\n欢迎查询帮助菜单\n当前可用查询为:None",
     "h":"心智模型003号为您服务\n欢迎查询帮助菜单\n目前没有可选的帮助项"
 }
 @Command.command_listener(command_cn='帮助',command_en='help',command_en_short='h',descript='查询帮助菜单',auxiliary_command=command_help_auxiliary)
 def command_help(message,auxiliary):
-    reply_text = "心智模型003号为您服务\n欢迎查询帮助菜单\n当前可用查询为:None"
     reply_text = help_reply_data[auxiliary]
-    reply_data = {
-        "message_source":message['message_source'],
-        "message_type":'reply',
-        "data":{
-            "message_active_region":message['data']['message_type'],
-            "user_id":message['data']['user_id'],
-            "message":reply_text
-        }
-    }
-    now_cd = 600
-    cd_user = reply_data['data']["user_id"]
-    if message['message_source'] == 'qq_group':
-        reply_data['data'].update({"group_id":message["data"]["group_id"]})
-        cd_user = reply_data['data']['group_id']
-        now_cd = 6000
-    if Command.judge_command_cd(message['message_source'],cd_user,'help',now_cd):
-        now_time = time.time()
-        cd_data = {
-            "cd":{
-                "help":{
-                    "start_time":now_time
-                }
-            }
-        }
-        CacheHandle.user_data[message['message_source']].update({cd_user:cd_data})
-    else:
-        reply_data["message_type"] = "warning"
-        reply_data['data'].update({"warning_type":"command_cd"})
+    reply_data = Command.message_data_to_reply_data(message)
+    reply_data['data'].update({"message":reply_text})
+    Command.cd_handler('help',reply_data,600,6000,message,3)
     CacheHandle.now_queue.put(reply_data)
+
+command_list_auxiliary = ['a','s']
+list_reply_data = {
+    '':CacheHandle.command_list_info,
+    'a':CacheHandle.command_list_all_info,
+    's':CacheHandle.command_list_short_info
+}
+@Command.command_listener(command_cn='命令列表',command_en='list',command_en_short='l',descript='查看命令列表',auxiliary_command=command_list_auxiliary)
+def command_list(message,auxiliary):
+    reply_text = list_reply_data[auxiliary]
+    reply_text = "当前命令列表为:\n" + reply_text + 'Over'
+    reply_data = Command.message_data_to_reply_data(message)
+    reply_data['data'].update({"message":reply_text})
+    Command.cd_handler('list',reply_data,600,6000,message,3)
+    CacheHandle.now_queue.put(reply_data)
+
+list_reply_data = {
+    '':CacheHandle.command_list_info,
+    'a':CacheHandle.command_list_all_info,
+    's':CacheHandle.command_list_short_info
+}

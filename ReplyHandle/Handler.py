@@ -4,7 +4,8 @@ import MessageHandle.SendQQMessage
 now_queue = queue.Queue()
 
 send_data = {
-    'qq':MessageHandle.SendQQMessage
+    'qq':MessageHandle.SendQQMessage,
+    'qq_group':MessageHandle.SendQQMessage
 }
 
 def start():

@@ -6,13 +6,6 @@ qq_bot = cqhttp.CQHttp()
 user_data = {'qq':{},'qq_group':{}}
 white_list = {'qq':{},'qq_group':{}}
 command_list = []
-
-# 添加命令进命令列表
-def append_command(command:Command):
-    global command_list
-    command_list.append(command)
-
-# 创建命令模组
-def create_variavle(name,var):
-    this_module = sys.modules[__name__]
-    setattr(this_module,name,var)
+command_list_info = ''
+command_list_all_info = ''
+command_list_short_info = ''
